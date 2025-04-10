@@ -1,0 +1,10 @@
+{
+  "name": "@hackmol/frontend",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "serve": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  }
+}
