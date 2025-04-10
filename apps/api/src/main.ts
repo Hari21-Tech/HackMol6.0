@@ -4,7 +4,7 @@ import cors from 'cors';
 import { Server } from 'socket.io';
 import http from 'http';
 
-import { setupSocketEvents } from './events';
+import { setupSocketEvents, setUpLiveUpdates } from './events';
 import database, { ensureTables } from '@hackmol/database';
 
 ensureTables();
@@ -20,13 +20,23 @@ app.use(express.json());
 app.options('*', cors());
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
+const frontend_receiver_server = http.createServer(app);
+const frontend_io = new Server(frontend_receiver_server);
+setUpLiveUpdates(frontend_io);
+
+frontend_receiver_server.listen(process.env.CLIENT_WS_PORT, () => {
+  console.log(
+    `Frontend update Server is running on port ${process.env.CLIENT_WS_PORT}`
+  );
+});
+
 const server = http.createServer(app);
 const io = new Server(server);
-setupSocketEvents(io);
+setupSocketEvents(io, frontend_io);
 
 server.listen(process.env.WS_PORT, () => {
   console.log(
-    `Server is running on http://192.168.208.70:${process.env.WS_PORT}`
+    `Server is running on port ${process.env.WS_PORT}`
   );
 });
 

@@ -1,16 +1,21 @@
 import { Server } from 'socket.io';
 
-export const setupSocketEvents = (io: Server) => {
+export const setUpLiveUpdates = (io: Server) => {
     io.on('connection', (socket) => {
-        console.log('A user connected:', socket.id);
+        console.log('A frontend user connected:', socket.id);
 
         socket.on('disconnect', () => {
-            console.log('User disconnected:', socket.id);
+            console.log('A frontend user disconnected:', socket.id);
         });
+    });
+}
 
-        socket.on('message', (data) => {
-            console.log('Message received:', data);
-            // Handle message event
+export const setupSocketEvents = (io: Server, frontend_io: Server) => {
+    io.on('connection', (socket) => {
+        console.log('An ai connected:', socket.id);
+
+        socket.on('disconnect', () => {
+            console.log('AI disconnected:', socket.id);
         });
 
         socket.on('queue_update', (data) => {
@@ -18,6 +23,9 @@ export const setupSocketEvents = (io: Server) => {
             if (!data.status) {
                 return;
             }
+            frontend_io.emit('queue_update', {
+                people: data.people
+            })
         });
     });
 };

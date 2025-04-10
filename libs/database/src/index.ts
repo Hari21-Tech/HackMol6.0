@@ -33,11 +33,11 @@ import {
 types.setTypeParser(1114, (str: string) => new Date(str));
 
 const pool = new Pool({
-  user: 'root',
-  host: 'localhost',
-  database: 'hackmol',
-  password: 'root',
-  port: 5432,
+  user: process.env.USER,
+  host: process.env.HOST,
+  database: process.env.DATABASE,
+  password: process.env.PASSWORD,
+  port: Number(process.env.DB_PORT ?? 5432),
 });
 
 type TableName =
