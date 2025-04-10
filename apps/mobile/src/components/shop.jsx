@@ -12,6 +12,13 @@ import * as Location from 'expo-location';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { useQueue } from './queueContext';
+import { io } from 'socket.io-client';
+
+const ETA_PER_PERSON = 2; // 2 minutes
+
+const socket = io(process.env.EXPO_PUBLIC_WS_ORIGIN, {
+  transports: ['websocket'],
+});
 
 export default function ShopDetail({ route, navigation }) {
   const { shop } = route.params;
@@ -19,8 +26,13 @@ export default function ShopDetail({ route, navigation }) {
   const [distance, setDistance] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
   const [queueCount, setQueueCount] = useState(0);
+  const [currentOccupancy, setCurrentOccupancy] = useState(0);
 
   useEffect(() => {
+    socket.on('queue_update', (data) => {
+      console.log('Queue update received:', data);
+      setCurrentOccupancy(data.people);
+    });
     const fetchQueueCount = async () => {
       const response = await fetch(
         `${process.env.EXPO_PUBLIC_ORIGIN}/api/get_queue/${shop.id}`
@@ -30,6 +42,10 @@ export default function ShopDetail({ route, navigation }) {
     };
     fetchQueueCount();
     getUserLocation();
+
+    return () => {
+      socket.off('queue_update');
+    }
   }, []);
 
   const getUserLocation = async () => {
@@ -89,10 +105,9 @@ export default function ShopDetail({ route, navigation }) {
             </View>
 
             <View>
-              <Text>Current Occupancy : {shop.current_occupancy}</Text>
+              <Text>Current Occupancy : {currentOccupancy}</Text>
               <Text>Total Capacity : {shop.total_occupancy}</Text>
-              <Text>Number of People in virtual queue : {queueCount}</Text>
-              {location && <Text>ETA : {shop.eta}</Text>}
+              {location && <Text>ETA : {(currentOccupancy + queueCount) * ETA_PER_PERSON} minutes</Text>}
             </View>
           </View>
         </ScrollView>
