@@ -3,6 +3,7 @@ import * as path from 'path';
 import cors from 'cors';
 import { Server } from 'socket.io';
 import http from 'http';
+import fetch from 'node-fetch';
 
 import { setupSocketEvents, setUpLiveUpdates } from './events';
 import database, { ensureTables } from '@hackmol/database';
@@ -36,24 +37,39 @@ frontend_io.on('connection', (socket) => {
     socket.on('get_shop', async (shop_id) => {
       const data = await database.shops.getShop(shop_id);
       const response = await fetch('https://picsum.photos/200/300');
+      if (!data.success) {
+        return;
+      }
       data.result.rows[0].image = response.url;
 
       return socket.emit('get_shop_result', data);
     });
     socket.on('get_shop_queue', async (shop_id) => {
       const data = await database.shop_queue.getQueue(shop_id);
+      if (!data.success) {
+        return;
+      }
       return socket.emit('get_shop_queue_result', data);
     });
     socket.on('get_parking', async (parking_id) => {
       const data = await database.parking_spot.getParkingSpots(parking_id);
+      if (!data.success) {
+        return;
+      }
       return socket.emit('get_parking_result', data);
     });
     socket.on('get_parking_spots', async (parking_id) => {
       const data = await database.parking_spot.getParkingSpots(parking_id);
+      if (!data.success) {
+        return;
+      }
       return socket.emit('get_parking_spots_result', data);
     });
     socket.on('get_user', async (user_id) => {
       const data = await database.users.getUser(user_id);
+      if (!data.success) {
+        return;
+      }
       return socket.emit('get_user_result', data);
     });
 });
