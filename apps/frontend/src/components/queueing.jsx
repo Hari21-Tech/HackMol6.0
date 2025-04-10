@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSocket } from '../context/SocketContext';
 import {
   Container,
   Paper,
@@ -22,46 +23,52 @@ import {
 } from '@mui/material';
 
 const QueueingPage = () => {
+  const { socket, connected } = useSocket();
   const [queueList, setQueueList] = useState([]);
   const [shopDetails, setShopDetails] = useState({
     totalCapacity: 0,
     currentOccupancy: 0,
     name: '',
-    address: '',
+    description: '',
   });
   const [openModal, setOpenModal] = useState(false);
-  const [newUser, setNewUser] = useState({ name: '', phone: '' });
+  const [newUser, setNewUser] = useState({ name: '' });
 
   useEffect(() => {
-    fetchQueueData();
-    fetchShopDetails();
-  }, []);
+    if (!socket) return;
 
-  const fetchQueueData = async () => {
-    setQueueList([
-      { id: 1, name: 'John Doe', phone: '123-456-7890' },
-      { id: 2, name: 'Jane Smith', phone: '098-765-4321' },
-    ]);
-  };
-
-  const fetchShopDetails = async () => {
-    // const data = await database.shops.getShop('2');
-    if (!data.success) {
-      setShopDetails({
-        totalCapacity: 50,
-        currentOccupancy: 30,
-        name: 'Sample Restaurant',
-        address: '123 Main St',
-      });
-      return;
-    }
-    setShopDetails({
-      totalCapacity: data.result.total_occupancy,
-      currentOccupancy: data.result.current_occupancy,
-      name: data.result.name,
-      address: data.result.address,
+    socket.on('get_shop_queue_result', (data) => {
+      const ids = data.result.rows.map((row) => row.user_id);
+      for (const id of ids) {
+        socket.emit('get_user', id);
+      }
     });
-  };
+    socket.on('get_user_result', (data) => {
+      const user = {
+        id: data.result.rows[0].id,
+        name: data.result.rows[0].username,
+      };
+      setQueueList((prevList) => [...prevList, user]);
+    });
+    socket.on('get_shop_result', (data) => {
+      setShopDetails({
+        totalCapacity: data.result.rows[0].total_occupancy,
+        currentOccupancy: data.result.rows[0].current_occupancy,
+        name: data.result.rows[0].name,
+        description: data.result.rows[0].name,
+      });
+    })
+
+    socket.emit('get_shop_queue', 1);
+    socket.emit('get_shop', 1);
+
+    return () => {
+      socket.off('get_shop_queue');
+      socket.off('get_user_result');
+      socket.off('get_user');
+      socket.off('get_shop');
+    }
+  }, []);
 
   const handleEditShopDetails = () => {
     console.log('Edit shop details');
@@ -73,14 +80,14 @@ const QueueingPage = () => {
   };
 
   const handleAddToQueue = () => {
-    if (newUser.name && newUser.phone) {
+    if (newUser.name) {
       const newId =
         queueList.length > 0 ? queueList[queueList.length - 1].id + 1 : 1;
       setQueueList([
         ...queueList,
-        { id: newId, name: newUser.name, phone: newUser.phone },
+        { id: newId, name: newUser.name },
       ]);
-      setNewUser({ name: '', phone: '' });
+      setNewUser({ name: '' });
       setOpenModal(false);
     }
   };
@@ -185,9 +192,6 @@ const QueueingPage = () => {
                   <TableCell className="font-semibold text-gray-700">
                     Name
                   </TableCell>
-                  <TableCell className="font-semibold text-gray-700">
-                    Phone Number
-                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -195,7 +199,6 @@ const QueueingPage = () => {
                   <TableRow key={person.id} className="hover:bg-gray-50">
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>{person.name}</TableCell>
-                    <TableCell>{person.phone}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -223,16 +226,6 @@ const QueueingPage = () => {
               value={newUser.name}
               onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
               className="mb-4"
-            />
-            <TextField
-              margin="dense"
-              label="Phone Number"
-              fullWidth
-              variant="outlined"
-              value={newUser.phone}
-              onChange={(e) =>
-                setNewUser({ ...newUser, phone: e.target.value })
-              }
             />
           </DialogContent>
           <DialogActions className="px-6 py-4">

@@ -7,24 +7,27 @@ import QueueingPage from '../components/queueing';
 import ParkingPage from '../components/parking';
 import FirePage from '../components/fire';
 import FallPage from '../components/fall';
+import { SocketProvider } from '../context/SocketContext';
 
 export function App() {
   return (
-    <Router>
-      <div className="flex h-screen">
-        <ServicesPanel />
-        <div className="flex-1 overflow-auto">
-          <Routes>
-            <Route path="/queueing" element={<QueueingPage />} />
-            {/* <Route path="/backtracking" element={<BacktrackingPage />} /> */}
-            <Route path="/parking" element={<ParkingPage />} />
-            <Route path="/fire" element={<FirePage />} />
-            <Route path="/fall" element={<FallPage />} />
-            <Route path="/" element={<QueueingPage />} />
-          </Routes>
+    <SocketProvider>
+      <Router>
+        <div className="flex h-screen">
+          <ServicesPanel />
+          <div className="flex-1 overflow-auto">
+            <Routes>
+              <Route path="/queueing" element={<QueueingPage />} />
+              {/* <Route path="/backtracking" element={<BacktrackingPage />} /> */}
+              <Route path="/parking" element={<ParkingPage />} />
+              <Route path="/fire" element={<FirePage />} />
+              <Route path="/fall" element={<FallPage />} />
+              <Route path="/" element={<QueueingPage />} />
+            </Routes>
+          </div>
         </div>
-      </div>
-    </Router>
+      </Router>
+    </SocketProvider>
   );
 }
 

@@ -30,5 +30,11 @@ export const setupSocketEvents = (
             frontend_io.emit('queue_update', data.people);
             admin_io.emit('queue_update', data.people);
         });
+
+        socket.on('fire', () => {
+            console.log('Fire event received');
+            frontend_io.emit('fire');
+            admin_io.emit('fire');
+        })
     });
 };
