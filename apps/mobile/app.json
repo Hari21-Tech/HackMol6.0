@@ -8,14 +8,22 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#ffffff",
+      "plugins": [
+        [
+          "expo-notifications",
+          {
+            "icon": "./assets/notification-icon.png",
+            "color": "#ffffff",
+            "sounds": ["./assets/notification-sound.wav"]
+          }
+        ]
+      ]
     },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },

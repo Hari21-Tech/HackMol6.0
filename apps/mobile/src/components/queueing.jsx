@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,13 +8,21 @@ import {
   StyleSheet,
   Modal,
   Button,
+  Platform,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { Picker } from '@react-native-picker/picker';
-
+import * as Notifications from 'expo-notifications';
 import { useQueue } from '../components/queueContext';
-
 import { LinearGradient } from 'expo-linear-gradient';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
 
 const shops = [
   {
@@ -69,6 +77,82 @@ export default function QueuePage({ navigation }) {
     useState(false);
 
   const [joinedShop, setJoinedShop] = useState(null);
+  const [expoPushToken, setExpoPushToken] = useState('');
+
+  useEffect(() => {
+    registerForPushNotificationsAsync().then((token) =>
+      setExpoPushToken(token)
+    );
+
+    const notificationListener = Notifications.addNotificationReceivedListener(
+      (notification) => {
+        console.log('Notification received:', notification);
+      }
+    );
+
+    const responseListener =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log('Notification response:', response);
+      });
+
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener);
+      Notifications.removeNotificationSubscription(responseListener);
+    };
+  }, []);
+
+  async function registerForPushNotificationsAsync() {
+    let token;
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+    }
+
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+      console.log('Failed to get push token for push notification!');
+      return;
+    }
+    token = (await Notifications.getExpoPushTokenAsync()).data;
+    return token;
+  }
+
+  const scheduleNotification = async (eta) => {
+    try {
+      await Notifications.cancelAllScheduledNotificationsAsync();
+
+      const timeToLeave = Math.max(eta - 5, 1);
+      console.log(
+        'Scheduling notification for',
+        timeToLeave,
+        'minutes from now'
+      );
+
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: 'Time to leave!',
+          body: `Your queue will be ready in ${timeToLeave} minutes. Time to head out!`,
+          sound: true,
+          priority: Notifications.AndroidNotificationPriority.HIGH,
+        },
+        trigger: {
+          seconds: timeToLeave * 60,
+        },
+      });
+    } catch (error) {
+      console.error('Error scheduling notification:', error);
+    }
+  };
 
   const handleJoinQueue = (shop) => {
     if (isUserSignedIn) {
@@ -79,9 +163,11 @@ export default function QueuePage({ navigation }) {
     }
   };
 
-  const handleLeaveQueue = () => {
+  const handleLeaveQueue = async () => {
     leaveShop();
     setJoinedShop(null);
+    // Cancel any scheduled notifications when leaving queue
+    await Notifications.cancelAllScheduledNotificationsAsync();
   };
 
   const closeSigninModal = () => {
@@ -102,7 +188,6 @@ export default function QueuePage({ navigation }) {
         {joinedShopId === item.id ? (
           <Text style={styles.category}>ETA: 10 minutes</Text>
         ) : null}
-
         {joinedShopId === item.id ? (
           <TouchableOpacity
             onPress={handleLeaveQueue}
@@ -200,9 +285,10 @@ export default function QueuePage({ navigation }) {
               </Text>
               <TouchableOpacity
                 style={styles.modalButton}
-                onPress={() => {
+                onPress={async () => {
                   setJoinedShop(selectedShopForConfirmation);
                   joinShop(selectedShopForConfirmation.id);
+                  await scheduleNotification(10); // Schedule notification for 10 minutes ETA
                   setIsConfirmationModalVisible(false);
                   navigation.navigate('Shop', {
                     shop: selectedShopForConfirmation,
