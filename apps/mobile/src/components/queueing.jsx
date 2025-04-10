@@ -12,6 +12,10 @@ import {
 import Toast from 'react-native-toast-message';
 import { Picker } from '@react-native-picker/picker';
 
+import { useQueue } from '../components/queueContext';
+
+import { LinearGradient } from 'expo-linear-gradient';
+
 const shops = [
   {
     id: 1,
@@ -55,7 +59,7 @@ const categories = [
 ];
 
 export default function QueuePage({ navigation }) {
-  const [joinedShop, setJoinedShop] = useState(null);
+  const { joinedShopId, joinShop, leaveShop } = useQueue();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [isUserSignedIn, setIsUserSignedIn] = useState(true);
   const [isSigninModalVisible, setIsSigninModalVisible] = useState(false);
@@ -64,6 +68,8 @@ export default function QueuePage({ navigation }) {
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] =
     useState(false);
 
+  const [joinedShop, setJoinedShop] = useState(null);
+
   const handleJoinQueue = (shop) => {
     if (isUserSignedIn) {
       setSelectedShopForConfirmation(shop);
@@ -71,6 +77,11 @@ export default function QueuePage({ navigation }) {
     } else {
       setIsSigninModalVisible(true);
     }
+  };
+
+  const handleLeaveQueue = () => {
+    leaveShop();
+    setJoinedShop(null);
   };
 
   const closeSigninModal = () => {
@@ -88,12 +99,25 @@ export default function QueuePage({ navigation }) {
       <View style={styles.cardContent}>
         <Text style={styles.name}>{item.name}</Text>
         <Text style={styles.category}>{item.category}</Text>
-        <TouchableOpacity
-          onPress={() => handleJoinQueue(item)}
-          style={[styles.button]}
-        >
-          <Text style={styles.buttonText}>Join Queue</Text>
-        </TouchableOpacity>
+        {joinedShopId === item.id ? (
+          <Text style={styles.category}>ETA: 10 minutes</Text>
+        ) : null}
+
+        {joinedShopId === item.id ? (
+          <TouchableOpacity
+            onPress={handleLeaveQueue}
+            style={[styles.button, styles.leaveButton]}
+          >
+            <Text style={styles.buttonText}>Leave Queue</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            onPress={() => handleJoinQueue(item)}
+            style={styles.button}
+          >
+            <Text style={styles.buttonText}>Join Queue</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -117,82 +141,88 @@ export default function QueuePage({ navigation }) {
   );
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={filteredShops}
-        renderItem={renderShop}
-        keyExtractor={(item) => item.id.toString()}
-        ListHeaderComponent={ListHeader}
-        contentContainerStyle={styles.list}
-      />
+    <LinearGradient
+      colors={['#0F3460', '#3A5BA0', '#5C93D1']}
+      style={styles.bgcontainer}
+    >
+      <View style={styles.innerContent}>
+        <FlatList
+          data={filteredShops}
+          renderItem={renderShop}
+          keyExtractor={(item) => item.id.toString()}
+          ListHeaderComponent={ListHeader}
+          contentContainerStyle={styles.list}
+        />
 
-      <Toast />
+        <Toast />
 
-      <Modal
-        transparent={true}
-        visible={isSigninModalVisible}
-        animationType="fade"
-        onRequestClose={closeSigninModal}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalCard}>
-            <Text style={{ fontFamily: 'Inter_400Regular' }}>
-              You need to sign in first.
-            </Text>
-            <Button
-              title="Sign In"
-              onPress={() => {
-                navigation.navigate('Shop');
-                setIsUserSignedIn(true);
-                closeSigninModal();
-              }}
-            />
-            <View style={{ height: 10 }} />
-            <Button title="Cancel" onPress={closeSigninModal} />
-          </View>
-        </View>
-      </Modal>
-
-      <Modal
-        transparent={true}
-        visible={isConfirmationModalVisible}
-        animationType="fade"
-        onRequestClose={() => setIsConfirmationModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalCard}>
-            <Text style={styles.modalText}>
-              Are you sure you want to join the queue for{' '}
-              <Text
-                style={{ fontWeight: 'bold', fontFamily: 'Inter_400Regular' }}
-              >
-                {selectedShopForConfirmation?.name}
+        <Modal
+          transparent={true}
+          visible={isSigninModalVisible}
+          animationType="fade"
+          onRequestClose={closeSigninModal}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalCard}>
+              <Text style={{ fontFamily: 'Inter_400Regular' }}>
+                You need to sign in first.
               </Text>
-              ?
-            </Text>
-            <TouchableOpacity
-              style={styles.modalButton}
-              onPress={() => {
-                setJoinedShop(selectedShopForConfirmation.id);
-                setIsConfirmationModalVisible(false);
-                navigation.navigate('Shop', {
-                  shop: selectedShopForConfirmation,
-                });
-              }}
-            >
-              <Text style={styles.modalButtonText}>Yes, Join Queue</Text>
-            </TouchableOpacity>
-            <View style={{ height: 10 }} />
-            <TouchableOpacity
-              style={styles.modalButtonOutline}
-              onPress={() => setIsConfirmationModalVisible(false)}
-            >
-              <Text style={styles.modalButtonOutlineText}>Cancel</Text>
-            </TouchableOpacity>
+              <Button
+                title="Sign In"
+                onPress={() => {
+                  navigation.navigate('Shop');
+                  setIsUserSignedIn(true);
+                  closeSigninModal();
+                }}
+              />
+              <View style={{ height: 10 }} />
+              <Button title="Cancel" onPress={closeSigninModal} />
+            </View>
           </View>
-        </View>
-      </Modal>
-    </View>
+        </Modal>
+
+        <Modal
+          transparent={true}
+          visible={isConfirmationModalVisible}
+          animationType="fade"
+          onRequestClose={() => setIsConfirmationModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalCard}>
+              <Text style={styles.modalText}>
+                Are you sure you want to join the queue for{' '}
+                <Text
+                  style={{ fontWeight: 'bold', fontFamily: 'Inter_400Regular' }}
+                >
+                  {selectedShopForConfirmation?.name}
+                </Text>
+                ?
+              </Text>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => {
+                  setJoinedShop(selectedShopForConfirmation);
+                  joinShop(selectedShopForConfirmation.id);
+                  setIsConfirmationModalVisible(false);
+                  navigation.navigate('Shop', {
+                    shop: selectedShopForConfirmation,
+                  });
+                }}
+              >
+                <Text style={styles.modalButtonText}>Yes, Join Queue</Text>
+              </TouchableOpacity>
+              <View style={{ height: 10 }} />
+              <TouchableOpacity
+                style={styles.modalButtonOutline}
+                onPress={() => setIsConfirmationModalVisible(false)}
+              >
+                <Text style={styles.modalButtonOutlineText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      </View>
+    </LinearGradient>
   );
 }
 
@@ -203,7 +233,7 @@ const styles = StyleSheet.create({
   },
   pickerContainer: {
     padding: 16,
-    paddingBottom: 0,
+    paddingBottom: 10,
   },
   pickerLabel: {
     fontSize: 16,
@@ -239,6 +269,11 @@ const styles = StyleSheet.create({
   cardContent: {
     padding: 12,
   },
+  innerContent: {
+    width: '100%',
+    maxWidth: '500',
+    alignSelf: 'center',
+  },
   name: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -254,6 +289,10 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 6,
     alignItems: 'center',
+    marginTop: 8,
+  },
+  leaveButton: {
+    backgroundColor: '#dc2626',
   },
   buttonText: {
     color: '#fff',
@@ -309,5 +348,11 @@ const styles = StyleSheet.create({
     color: '#4f46e5',
     fontSize: 16,
     fontFamily: 'Inter_400Regular',
+  },
+  bgcontainer: {
+    flex: 1,
+    padding: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

@@ -6,7 +6,10 @@ import Queuing from '../components/queueing';
 // import Parking from '../components/parking';
 // import ParkingSpot from '../components/parkingSpot';
 // import SignIn from '../components/signin';
-// import ShopDetails from '../components/shop';
+import ShopDetails from '../components/shop';
+import { StyleSheet } from 'react-native';
+import { QueueProvider } from '../components/queueContext';
+
 import {
   useFonts,
   Inter_400Regular,
@@ -35,16 +38,23 @@ export const App = () => {
   // }
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Queuing" component={Queuing} />
-        {/* {<Stack.Screen name="Parking Helper" component={Parking} />} */}
-        {/* <Stack.Screen name="ParkingSpot" component={ParkingSpot} /> */}
-        {/* <Stack.Screen name="SignIn" component={SignIn} /> */}
-        {/* <Stack.Screen name="Shop" component={ShopDetails} />  */}
-      </Stack.Navigator>
-    </NavigationContainer>
+    <QueueProvider>
+      <NavigationContainer>
+        {/* <LinearGradient
+        colors={['#0F3460', '#3A5BA0', '#5C93D1']}
+        style={styles.container}
+      > */}
+        <Stack.Navigator>
+          <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen name="Queuing" component={Queuing} />
+          {/* {<Stack.Screen name="Parking Helper" component={Parking} />} */}
+          {/* <Stack.Screen name="ParkingSpot" component={ParkingSpot} /> */}
+          {/* <Stack.Screen name="SignIn" component={SignIn} /> */}
+          <Stack.Screen name="Shop" component={ShopDetails} />
+        </Stack.Navigator>
+        {/* </LinearGradient> */}
+      </NavigationContainer>
+    </QueueProvider>
   );
 };
 
