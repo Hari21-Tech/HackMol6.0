@@ -1,9 +1,36 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSocket } from '../context/SocketContext';
 
 const ParkingPage = () => {
-  const [vacantSpots] = useState(['A1', 'A2', 'B3', 'C4', 'A5', 'A6', 'F9']);
+  const { socket, connected } = useSocket();
+  const [vacantSpots, setVacantSpots] = useState([]);
   const [totalSpots, setTotalSpots] = useState(100);
-  const NoOfVacantSpots = vacantSpots.length;
+  let NoOfVacantSpots = vacantSpots.length;
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on('get_parking_result', (data) => {
+      console.log('get_parking_result', data);
+      setTotalSpots(data.result.rows[0].maximum_number_of_spots);
+    });
+    socket.on('get_parking_spots_result', (data) => {
+      console.log('get_parking_spots_result', data);
+      const spots = data.result.rows.map((spot) => `${spot.floor}-${spot.spot}`);
+      setVacantSpots(spots);
+      NoOfVacantSpots = spots.length;
+    });
+
+    if (connected) {
+      socket.emit('get_parking', 1);
+      socket.emit('get_parking_spots', 1);
+    }
+
+    return () => {
+      socket.off('get_parking_result');
+      socket.off('get_parking_spots_result');
+    }
+  })
 
   return (
     <div className="p-6">
