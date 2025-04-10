@@ -17,6 +17,7 @@ import {
 } from '@expo-google-fonts/inter';
 // import AppLoading from 'expo-app-loading';
 import * as SplashScreen from 'expo-splash-screen';
+import { SocketProvider } from '../context/SocketContext';
 
 if (SplashScreen.preventAutoHideAsync) {
   SplashScreen.preventAutoHideAsync();
@@ -38,23 +39,25 @@ export const App = () => {
   // }
 
   return (
-    <QueueProvider>
-      <NavigationContainer>
-        {/* <LinearGradient
-        colors={['#0F3460', '#3A5BA0', '#5C93D1']}
-        style={styles.container}
-      > */}
-        <Stack.Navigator>
-          <Stack.Screen name="Home" component={Home} />
-          <Stack.Screen name="Queuing" component={Queuing} />
-          {/* {<Stack.Screen name="Parking Helper" component={Parking} />} */}
-          {/* <Stack.Screen name="ParkingSpot" component={ParkingSpot} /> */}
-          {/* <Stack.Screen name="SignIn" component={SignIn} /> */}
-          <Stack.Screen name="Shop" component={ShopDetails} />
-        </Stack.Navigator>
-        {/* </LinearGradient> */}
-      </NavigationContainer>
-    </QueueProvider>
+    <SocketProvider>
+      <QueueProvider>
+        <NavigationContainer>
+          {/* <LinearGradient
+          colors={['#0F3460', '#3A5BA0', '#5C93D1']}
+          style={styles.container}
+        > */}
+          <Stack.Navigator>
+            <Stack.Screen name="Home" component={Home} />
+            <Stack.Screen name="Queuing" component={Queuing} />
+            {/* {<Stack.Screen name="Parking Helper" component={Parking} />} */}
+            {/* <Stack.Screen name="ParkingSpot" component={ParkingSpot} /> */}
+            {/* <Stack.Screen name="SignIn" component={SignIn} /> */}
+            <Stack.Screen name="Shop" component={ShopDetails} />
+          </Stack.Navigator>
+          {/* </LinearGradient> */}
+        </NavigationContainer>
+      </QueueProvider>
+    </SocketProvider>
   );
 };
 

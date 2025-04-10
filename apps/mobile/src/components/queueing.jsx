@@ -15,6 +15,7 @@ import { Picker } from '@react-native-picker/picker';
 import * as Notifications from 'expo-notifications';
 import { useQueue } from '../components/queueContext';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSocket } from '../context/SocketContext';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -60,6 +61,7 @@ Notifications.setNotificationHandler({
 const categories = ['All', 'Food', 'Fashion', 'Electronics'];
 
 export default function QueuePage({ navigation }) {
+  const { socket, connected } = useSocket();
   const { joinedShopId, joinShop, leaveShop } = useQueue();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [isUserSignedIn, setIsUserSignedIn] = useState(true);
@@ -75,20 +77,19 @@ export default function QueuePage({ navigation }) {
   const [expoPushToken, setExpoPushToken] = useState('');
 
   useEffect(() => {
+    if (!socket) return;
+    socket.on('get_shop_result', (data) => {
+      if (!data.success) {
+        return;
+      }
+      console.log(data.result.rows[0]);
+      setShopDetails((prev) => [...prev, data.result.rows[0]]);
+    });
+
     const fetchShopDetails = async () => {
       console.log('fuck');
       for (let i = 1; i <= 5; i++) {
-        const raw_data = await fetch(
-          `${process.env.EXPO_PUBLIC_ORIGIN}/api/get_shop/${i}`
-        );
-        console.log(raw_data);
-        const data = await raw_data.json();
-        console.log(data);
-        if (!data.success) {
-          return;
-        }
-        console.log(data.result.rows[0]);
-        setShopDetails((prev) => [...prev, data.result.rows[0]]);
+        socket.emit('get_shop', i);
       }
     };
 
@@ -111,10 +112,11 @@ export default function QueuePage({ navigation }) {
     //     console.log('Notification response:', response);
     //   });
 
-    // return () => {
-    //   Notifications.removeNotificationSubscription(notificationListener);
-    //   Notifications.removeNotificationSubscription(responseListener);
-    // };
+    return () => {
+      socket.off('get_shop_result')
+      // Notifications.removeNotificationSubscription(notificationListener);
+      // Notifications.removeNotificationSubscription(responseListener);
+    };
   }, []);
 
   async function registerForPushNotificationsAsync() {
