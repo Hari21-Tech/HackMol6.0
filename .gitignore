@@ -56,3 +56,8 @@ npm-debug.*
 *.orig.*
 web-build/
 cache/
+
+# Environment variables
+.env
+.env.*
+!.env.example
