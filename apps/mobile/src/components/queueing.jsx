@@ -24,47 +24,40 @@ Notifications.setNotificationHandler({
   }),
 });
 
-const shops = [
-  {
-    id: 1,
-    name: 'Burger Bite',
-    category: 'Food and Beverages',
-    image: 'https://source.unsplash.com/featured/?burger',
-  },
-  {
-    id: 2,
-    name: 'Salon Xpress',
-    category: 'Barbers',
-    image: 'https://source.unsplash.com/featured/?barber',
-  },
-  {
-    id: 3,
-    name: 'Glow Beauty',
-    category: 'Beauty Parlors',
-    image: 'https://source.unsplash.com/featured/?beauty',
-  },
-  {
-    id: 4,
-    name: 'ElectroMart',
-    category: 'Electronic Shops',
-    image: 'https://source.unsplash.com/featured/?electronics',
-  },
-  {
-    id: 5,
-    name: 'AutoFix Garage',
-    category: 'Automotive Garages',
-    image: 'https://source.unsplash.com/featured/?garage',
-  },
-];
+// const shops = [
+//   {
+//     id: 1,
+//     name: 'Burger Bite',
+//     category: 'Food and Beverages',
+//     image: 'https://source.unsplash.com/featured/?burger',
+//   },
+//   {
+//     id: 2,
+//     name: 'Salon Xpress',
+//     category: 'Barbers',
+//     image: 'https://source.unsplash.com/featured/?barber',
+//   },
+//   {
+//     id: 3,
+//     name: 'Glow Beauty',
+//     category: 'Beauty Parlors',
+//     image: 'https://source.unsplash.com/featured/?beauty',
+//   },
+//   {
+//     id: 4,
+//     name: 'ElectroMart',
+//     category: 'Electronic Shops',
+//     image: 'https://source.unsplash.com/featured/?electronics',
+//   },
+//   {
+//     id: 5,
+//     name: 'AutoFix Garage',
+//     category: 'Automotive Garages',
+//     image: 'https://source.unsplash.com/featured/?garage',
+//   },
+// ];
 
-const categories = [
-  'All',
-  'Food and Beverages',
-  'Barbers',
-  'Beauty Parlors',
-  'Electronic Shops',
-  'Automotive Garages',
-];
+const categories = ['All', 'Food', 'Fashion', 'Electronics'];
 
 export default function QueuePage({ navigation }) {
   const { joinedShopId, joinShop, leaveShop } = useQueue();
@@ -76,29 +69,52 @@ export default function QueuePage({ navigation }) {
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] =
     useState(false);
 
+  const [shopDetails, setShopDetails] = useState([]);
+
   const [joinedShop, setJoinedShop] = useState(null);
   const [expoPushToken, setExpoPushToken] = useState('');
 
   useEffect(() => {
-    registerForPushNotificationsAsync().then((token) =>
-      setExpoPushToken(token)
-    );
-
-    const notificationListener = Notifications.addNotificationReceivedListener(
-      (notification) => {
-        console.log('Notification received:', notification);
+    const fetchShopDetails = async () => {
+      console.log('fuck');
+      for (let i = 1; i <= 5; i++) {
+        const raw_data = await fetch(
+          `http://192.168.208.88:5000/api/get_shop/${i}`
+        );
+        console.log(raw_data);
+        const data = await raw_data.json();
+        console.log(data);
+        if (!data.success) {
+          return;
+        }
+        console.log(data.result.rows[0]);
+        setShopDetails((prev) => [...prev, data.result.rows[0]]);
       }
-    );
-
-    const responseListener =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log('Notification response:', response);
-      });
-
-    return () => {
-      Notifications.removeNotificationSubscription(notificationListener);
-      Notifications.removeNotificationSubscription(responseListener);
     };
+
+    console.log('fuck2');
+    fetchShopDetails();
+    console.log(shopDetails);
+
+    // registerForPushNotificationsAsync().then((token) =>
+    //   setExpoPushToken(token)
+    // );
+
+    // const notificationListener = Notifications.addNotificationReceivedListener(
+    //   (notification) => {
+    //     console.log('Notification received:', notification);
+    //   }
+    // );
+
+    // const responseListener =
+    //   Notifications.addNotificationResponseReceivedListener((response) => {
+    //     console.log('Notification response:', response);
+    //   });
+
+    // return () => {
+    //   Notifications.removeNotificationSubscription(notificationListener);
+    //   Notifications.removeNotificationSubscription(responseListener);
+    // };
   }, []);
 
   async function registerForPushNotificationsAsync() {
@@ -167,7 +183,7 @@ export default function QueuePage({ navigation }) {
     leaveShop();
     setJoinedShop(null);
     // Cancel any scheduled notifications when leaving queue
-    await Notifications.cancelAllScheduledNotificationsAsync();
+    // await Notifications.cancelAllScheduledNotificationsAsync();
   };
 
   const closeSigninModal = () => {
@@ -176,8 +192,8 @@ export default function QueuePage({ navigation }) {
 
   const filteredShops =
     selectedCategory === 'All'
-      ? shops
-      : shops.filter((shop) => shop.category === selectedCategory);
+      ? shopDetails
+      : shopDetails.filter((shop) => shop.category === selectedCategory);
 
   const renderShop = ({ item }) => (
     <View style={styles.card}>
@@ -288,7 +304,7 @@ export default function QueuePage({ navigation }) {
                 onPress={async () => {
                   setJoinedShop(selectedShopForConfirmation);
                   joinShop(selectedShopForConfirmation.id);
-                  await scheduleNotification(10); // Schedule notification for 10 minutes ETA
+                  // await scheduleNotification(10); // Schedule notification for 10 minutes ETA
                   setIsConfirmationModalVisible(false);
                   navigation.navigate('Shop', {
                     shop: selectedShopForConfirmation,

@@ -18,8 +18,17 @@ export default function ShopDetail({ route, navigation }) {
   const [location, setLocation] = useState(null);
   const [distance, setDistance] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
+  const [queueCount, setQueueCount] = useState(0);
 
   useEffect(() => {
+    const fetchQueueCount = async () => {
+      const response = await fetch(
+        `http://192.168.208.88:5000/api/get_queue/${shop.id}`
+      );
+      const data = await response.json();
+      setQueueCount(data.result.rows.length);
+    };
+    fetchQueueCount();
     getUserLocation();
   }, []);
 
@@ -80,11 +89,9 @@ export default function ShopDetail({ route, navigation }) {
             </View>
 
             <View>
-              <Text>Current Occupancy : {shop.currentOccupancy}</Text>
-              <Text>Total Capacity : {shop.totalCapacity}</Text>
-              <Text>
-                Number of People in virtual queue : {shop.virtualQueueCount}
-              </Text>
+              <Text>Current Occupancy : {shop.current_occupancy}</Text>
+              <Text>Total Capacity : {shop.total_occupancy}</Text>
+              <Text>Number of People in virtual queue : {queueCount}</Text>
               {location && <Text>ETA : {shop.eta}</Text>}
             </View>
           </View>
