@@ -45,7 +45,7 @@ const QueueingPage = () => {
   };
 
   const fetchShopDetails = async () => {
-    const data = await database.shops.getShop('2');
+    // const data = await database.shops.getShop('2');
     if (!data.success) {
       setShopDetails({
         totalCapacity: 50,
