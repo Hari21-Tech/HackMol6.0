@@ -23,7 +23,7 @@ export default function ShopDetail({ route, navigation }) {
   useEffect(() => {
     const fetchQueueCount = async () => {
       const response = await fetch(
-        `http://192.168.208.88:5000/api/get_queue/${shop.id}`
+        `${process.env.EXPO_PUBLIC_ORIGIN}/api/get_queue/${shop.id}`
       );
       const data = await response.json();
       setQueueCount(data.result.rows.length);

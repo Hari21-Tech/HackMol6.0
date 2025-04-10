@@ -35,7 +35,7 @@
     "eslint-config-prettier": "^10.0.0",
     "expo-cli": "^6.3.10",
     "jest-expo": "~52.0.2",
-    "nx": "20.7.2",
+    "nx": "^20.7.2",
     "prettier": "^2.6.2",
     "react-refresh": "^0.10.0",
     "react-test-renderer": "~18.3.1",
@@ -76,6 +76,7 @@
     "react-native-svg": "~15.8.0",
     "react-native-svg-transformer": "~1.5.0",
     "react-native-toast-message": "^2.2.1",
-    "react-native-web": "~0.19.13"
+    "react-native-web": "~0.19.13",
+    "socket.io": "^4.8.1"
   }
 }

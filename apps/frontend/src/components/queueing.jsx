@@ -20,7 +20,6 @@ import {
   DialogActions,
   TextField,
 } from '@mui/material';
-import database from '@hackmol/database';
 
 const QueueingPage = () => {
   const [queueList, setQueueList] = useState([]);

@@ -13,8 +13,8 @@ import {
   randLatitude,
   randLongitude,
   randProductDescription,
-  randUrl,
   randNumber,
+  randImg,
 } from '@ngneat/falso';
 export const fakerData: () => ShopData = () => ({
   name: randUserName(),
@@ -23,7 +23,7 @@ export const fakerData: () => ShopData = () => ({
     latitude: randLatitude(),
     longitude: randLongitude(),
   },
-  image: randUrl(),
+  image: randImg(),
   current_occupancy: randNumber({ max: 10 }),
   total_occupancy: randNumber({ min: 15, max: 30 }),
 });

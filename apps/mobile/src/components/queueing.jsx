@@ -79,7 +79,7 @@ export default function QueuePage({ navigation }) {
       console.log('fuck');
       for (let i = 1; i <= 5; i++) {
         const raw_data = await fetch(
-          `http://192.168.208.88:5000/api/get_shop/${i}`
+          `${process.env.EXPO_PUBLIC_ORIGIN}/api/get_shop/${i}`
         );
         console.log(raw_data);
         const data = await raw_data.json();

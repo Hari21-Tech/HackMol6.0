@@ -1,30 +1,34 @@
 import express from 'express';
 import * as path from 'path';
 import cors from 'cors';
+import { Server } from 'socket.io';
+import http from 'http';
 
+import { setupSocketEvents } from './events';
 import database, { ensureTables } from '@hackmol/database';
-import { AI } from './ai';
 
 ensureTables();
-
-new AI()
-  .onOpen(() => {
-    return;
-  })
-  .onClose(() => {
-    return;
-  });
 
 const app = express();
 app.use(
   cors({
-    origin: 'exp://192.168.208.88:19000',
+    origin: process.env.EXPO_ORIGIN,
     credentials: true,
   })
 );
 app.use(express.json());
 app.options('*', cors());
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
+
+const server = http.createServer(app);
+const io = new Server(server);
+setupSocketEvents(io);
+
+server.listen(process.env.WS_PORT, () => {
+  console.log(
+    `Server is running on http://192.168.208.70:${process.env.WS_PORT}`
+  );
+});
 
 const router = express.Router();
 router.get('/', (req, res) => {
@@ -47,7 +51,13 @@ router.get('/fuck', (req, res) => {
   });
 });
 router.get('/get_shop/:id', async (req, res) => {
-  res.send(await database.shops.getShop(req.params.id));
+  const data = await database.shops.getShop(req.params.id);
+  if (!data.success) {
+    return res.send(data);
+  }
+  const response = await fetch('https://picsum.photos/200/300');
+  data.result.rows[0].image = response.url;
+  return res.send(data);
 });
 router.get('/get_queue/:id', async (req, res) => {
   res.send(await database.shop_queue.getQueue(Number(req.params.id)));
@@ -55,7 +65,7 @@ router.get('/get_queue/:id', async (req, res) => {
 
 app.use('/api', router);
 const port = Number(process.env.PORT);
-const server = app.listen(port, () => {
+const app_server = app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}/api`);
 });
-server.on('error', console.error.bind(null, 'Server Error: '));
+app_server.on('error', console.error.bind(null, 'Server Error: '));
