@@ -12,15 +12,12 @@ import * as Location from 'expo-location';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { useQueue } from './queueContext';
-import { io } from 'socket.io-client';
+import { useSocket } from '../context/SocketContext';
 
 const ETA_PER_PERSON = 2; // 2 minutes
 
-const socket = io(process.env.EXPO_PUBLIC_WS_ORIGIN, {
-  transports: ['websocket'],
-});
-
 export default function ShopDetail({ route, navigation }) {
+  const { socket, connected } = useSocket();
   const { shop } = route.params;
   const [location, setLocation] = useState(null);
   const [distance, setDistance] = useState(0);
@@ -29,21 +26,23 @@ export default function ShopDetail({ route, navigation }) {
   const [currentOccupancy, setCurrentOccupancy] = useState(0);
 
   useEffect(() => {
+    if (!socket) return;
+    socket.on('get_shop_queue_result', (data) => {
+      setQueueCount(data.result.rows.length);
+    })
     socket.on('queue_update', (data) => {
       console.log('Queue update received:', data);
       setCurrentOccupancy(data.people);
     });
-    const fetchQueueCount = async () => {
-      const response = await fetch(
-        `${process.env.EXPO_PUBLIC_ORIGIN}/api/get_queue/${shop.id}`
-      );
-      const data = await response.json();
-      setQueueCount(data.result.rows.length);
-    };
-    fetchQueueCount();
+
+    if (connected) {
+      socket.emit('get_shop_queue', shop.id);
+    }
+
     getUserLocation();
 
     return () => {
+      socket.off('get_shop_queue_result');
       socket.off('queue_update');
     }
   }, []);
