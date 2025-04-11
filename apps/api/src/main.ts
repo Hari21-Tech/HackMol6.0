@@ -72,6 +72,10 @@ frontend_io.on('connection', (socket) => {
       }
       return socket.emit('get_user_result', data);
     });
+    socket.on('start_back_tracking', (label) => {
+      console.log('Starting backtracking for label:', label);
+      io.emit('start_back_tracking', label);
+    })
 });
 
 frontend_receiver_server.listen(process.env.CLIENT_WS_PORT, () => {
@@ -82,7 +86,7 @@ frontend_receiver_server.listen(process.env.CLIENT_WS_PORT, () => {
 
 admin_receiver_server.listen(process.env.ADMIN_WS_PORT, () => {
   console.log(
-    `Admin update Server is running on port ${process.env.CLIENT_WS_PORT}`
+    `Admin update Server is running on port ${process.env.ADMIN_WS_PORT}`
   );
 });
 

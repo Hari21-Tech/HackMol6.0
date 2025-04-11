@@ -1,5 +1,12 @@
 import { Server } from 'socket.io';
 
+type BackTrackingData = {
+    object: string;
+    last_holder: string;
+    last_seen_time: string;
+    last_camera: string;
+}
+
 export const setUpLiveUpdates = (io: Server, tag: string) => {
     io.on('connection', (socket) => {
         console.log(`A ${tag} user connected:`, socket.id);
@@ -31,10 +38,14 @@ export const setupSocketEvents = (
             admin_io.emit('queue_update', data.people);
         });
 
+        socket.on('back_tracking', (data: BackTrackingData) => {
+            console.log('Backtracking data: ', data);
+        });
+
         socket.on('fire', () => {
             console.log('Fire event received');
             frontend_io.emit('fire');
             admin_io.emit('fire');
-        })
+        });
     });
 };
