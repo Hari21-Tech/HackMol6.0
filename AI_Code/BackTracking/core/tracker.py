@@ -5,6 +5,7 @@ import numpy as np
 from datetime import datetime
 from core.facial import FacialRecognition
 from core.yolo_detector import ObjectDetector
+from core.object_history import ObjectHistory
 
 class MultiCamTracker:
     def __init__(self, sources=[0], log_file="data/track_log.csv"):
@@ -13,6 +14,7 @@ class MultiCamTracker:
         self.object_detector = ObjectDetector()
         self.log_file = log_file
         self.cams = [cv2.VideoCapture(src) for src in sources]
+        self.object_history = ObjectHistory()
         
         # Initialize tracking state
         os.makedirs(os.path.dirname(log_file), exist_ok=True)
@@ -165,8 +167,23 @@ class MultiCamTracker:
             face_locations = face_recognition.face_locations(frame)
             objects = self.object_detector.detect(frame)
             
+            for i in range(len(objects)):
+                obj = objects[i]
+                if obj["conf"] > 50:
+                    continue
+                obj_id = self.object_history.identify(obj)
+                print(obj_id)
+                if obj_id:
+                    self.object_history.update(obj_id, obj)
+                else:
+                    obj_id = self.object_history.insert(obj)
+                
+                objects[i]["id"] = obj_id
+            self.object_history.clear_frame()
+            
+            
             # Get current objects and person
-            current_objects = set(obj['label'] for obj in objects)
+            current_objects = set(obj['id'] for obj in objects)
             current_person = None
             current_person_objects = set()
             
@@ -183,7 +200,7 @@ class MultiCamTracker:
                     # Check each object's proximity to the current person
                     for obj in objects:
                         if self.is_near(face_location, obj["bbox"]):
-                            current_person_objects.add(obj['label'])
+                            current_person_objects.add(obj['id'])
                             
                 except Exception as e:
                     print(f"Error processing face in camera {camera_id}: {str(e)}")
@@ -238,19 +255,21 @@ class MultiCamTracker:
 
             # Update frame with detections and history
             frame = self.draw_detections(frame, face_locations, objects)
+            frame = self.object_history.draw_locations(frame)
             
             # Draw abandoned object indicators with history
             for obj in objects:
-                if obj['label'] in current_abandoned:
+                if obj['id'] in current_abandoned:
                     x1, y1, x2, y2 = obj["bbox"]
                     cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 255), 2)
-                    history = self.get_object_history(obj['label'])
+                    history = self.get_object_history(obj['id'])
                     if history and history["last_person"]:
                         text = f"ABANDONED (Last: {history['last_person']})"
                     else:
                         text = "ABANDONED"
-                    cv2.putText(frame, text, (x1, y1 - 10),
-                              cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+                    # Currently Annoying, turn it back on
+                    # cv2.putText(frame, text, (x1, y1 - 10),
+                    #           cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
 
             cv2.imshow(f"Camera {camera_id}", frame)
 
@@ -299,7 +318,7 @@ class MultiCamTracker:
             cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
         for obj in objects:
             x1, y1, x2, y2 = obj["bbox"]
-            label = obj["label"]
+            label = obj["id"]
             cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 0), 2)
             cv2.putText(frame, label, (x1, y1 - 10),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
