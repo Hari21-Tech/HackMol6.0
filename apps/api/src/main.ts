@@ -34,44 +34,51 @@ const io = new Server(server);
 setupSocketEvents(io, frontend_io, admin_io);
 
 frontend_io.on('connection', (socket) => {
-    socket.on('get_shop', async (shop_id) => {
-      const data = await database.shops.getShop(shop_id);
-      const response = await fetch('https://picsum.photos/200/300');
-      if (!data.success) {
-        return;
-      }
-      data.result.rows[0].image = response.url;
+  socket.on('get_shop', async (shop_id) => {
+    const data = await database.shops.getShop(shop_id);
+    const response = await fetch('https://picsum.photos/200/300');
+    if (!data.success) {
+      return;
+    }
+    data.result.rows[0].image = response.url;
 
-      return socket.emit('get_shop_result', data);
-    });
-    socket.on('get_shop_queue', async (shop_id) => {
-      const data = await database.shop_queue.getQueue(shop_id);
-      if (!data.success) {
-        return;
-      }
-      return socket.emit('get_shop_queue_result', data);
-    });
-    socket.on('get_parking', async (parking_id) => {
-      const data = await database.parking_spot.getParkingSpots(parking_id);
-      if (!data.success) {
-        return;
-      }
-      return socket.emit('get_parking_result', data);
-    });
-    socket.on('get_parking_spots', async (parking_id) => {
-      const data = await database.parking_spot.getParkingSpots(parking_id);
-      if (!data.success) {
-        return;
-      }
-      return socket.emit('get_parking_spots_result', data);
-    });
-    socket.on('get_user', async (user_id) => {
-      const data = await database.users.getUser(user_id);
-      if (!data.success) {
-        return;
-      }
-      return socket.emit('get_user_result', data);
-    });
+    return socket.emit('get_shop_result', data);
+  });
+  socket.on('get_shop_queue', async (shop_id) => {
+    const data = await database.shop_queue.getQueue(shop_id);
+    if (!data.success) {
+      return;
+    }
+    return socket.emit('get_shop_queue_result', data);
+  });
+  socket.on('get_parking', async (parking_id) => {
+    const data = await database.parking_spot.getParkingSpots(parking_id);
+    if (!data.success) {
+      return;
+    }
+    return socket.emit('get_parking_result', data);
+  });
+  socket.on('get_parking_spots', async (parking_id) => {
+    const data = await database.parking_spot.getParkingSpots(parking_id);
+    if (!data.success) {
+      return;
+    }
+    return socket.emit('get_parking_spots_result', data);
+  });
+  socket.on('get_user', async (user_id) => {
+    const data = await database.users.getUser(user_id);
+    if (!data.success) {
+      return;
+    }
+    return socket.emit('get_user_result', data);
+  });
+  socket.on('get_all_parking', async () => {
+    const data = await database.parking.getAllParking();
+    if (!data.success) {
+      return;
+    }
+    return socket.emit('get_all_parking_result', data);
+  });
 });
 
 frontend_receiver_server.listen(process.env.CLIENT_WS_PORT, () => {
@@ -82,12 +89,10 @@ frontend_receiver_server.listen(process.env.CLIENT_WS_PORT, () => {
 
 admin_receiver_server.listen(process.env.ADMIN_WS_PORT, () => {
   console.log(
-    `Admin update Server is running on port ${process.env.CLIENT_WS_PORT}`
+    `Admin update Server is running on port ${process.env.ADMIN_WS_PORT}`
   );
 });
 
 server.listen(process.env.WS_PORT, () => {
-  console.log(
-    `Server is running on port ${process.env.WS_PORT}`
-  );
+  console.log(`Server is running on port ${process.env.WS_PORT}`);
 });

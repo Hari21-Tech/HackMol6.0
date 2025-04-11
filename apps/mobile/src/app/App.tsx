@@ -3,9 +3,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Home from '../components/home';
 import Queuing from '../components/queueing';
-// import Parking from '../components/parking';
-// import ParkingSpot from '../components/parkingSpot';
+import Parking from '../components/parking';
+import ParkingLot from '../components/parkingLot';
 // import SignIn from '../components/signin';
+import Backtracking from '../components/backtracking';
 import ShopDetails from '../components/shop';
 import { StyleSheet } from 'react-native';
 import { QueueProvider } from '../components/queueContext';
@@ -48,9 +49,10 @@ export const App = () => {
         > */}
           <Stack.Navigator>
             <Stack.Screen name="Home" component={Home} />
+            <Stack.Screen name="Backtracking" component={Backtracking} />
             <Stack.Screen name="Queuing" component={Queuing} />
-            {/* {<Stack.Screen name="Parking Helper" component={Parking} />} */}
-            {/* <Stack.Screen name="ParkingSpot" component={ParkingSpot} /> */}
+            {<Stack.Screen name="Parking Helper" component={Parking} />}
+            <Stack.Screen name="ParkingLots" component={ParkingLot} />
             {/* <Stack.Screen name="SignIn" component={SignIn} /> */}
             <Stack.Screen name="Shop" component={ShopDetails} />
           </Stack.Navigator>

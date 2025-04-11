@@ -19,8 +19,8 @@ export const fakerData: () => ParkingSpotData = () => ({
 const CREATE_QUERY =
   'INSERT INTO parking_spot (parking_id, floor, spot) VALUES ($1, $2, $3) ON CONFLICT (parking_id, position_label) DO NOTHING;';
 const GET_QUERY = 'SELECT * FROM parking_spot WHERE parking_id=$1;';
-const DELETE_QUERY = 'DELETE FROM parkings WHERE id=$1;';
-const DELETE_ALL_QUERY = 'DELETE FROM parkings WHERE parking_id=$1;';
+const DELETE_QUERY = 'DELETE FROM parking_spot WHERE id=$1;';
+const DELETE_ALL_QUERY = 'DELETE FROM parking_spot WHERE parking_id=$1;';
 
 import { Pool } from 'pg';
 import { Result, DatabaseReturn } from './result.js';

@@ -5,7 +5,8 @@ const ParkingPage = () => {
   const { socket, connected } = useSocket();
   const [vacantSpots, setVacantSpots] = useState([]);
   const [totalSpots, setTotalSpots] = useState(100);
-  let NoOfVacantSpots = vacantSpots.length;
+
+  const [noOfVacantSpots, setNoOfVacantSpots] = useState(0);
 
   useEffect(() => {
     if (!socket) return;
@@ -16,9 +17,11 @@ const ParkingPage = () => {
     });
     socket.on('get_parking_spots_result', (data) => {
       console.log('get_parking_spots_result', data);
-      const spots = data.result.rows.map((spot) => `${spot.floor}-${spot.spot}`);
+      const spots = data.result.rows.map(
+        (spot) => `${spot.floor}-${spot.spot}`
+      );
       setVacantSpots(spots);
-      NoOfVacantSpots = spots.length;
+      setNoOfVacantSpots(spots.length);
     });
 
     if (connected) {
@@ -29,8 +32,8 @@ const ParkingPage = () => {
     return () => {
       socket.off('get_parking_result');
       socket.off('get_parking_spots_result');
-    }
-  })
+    };
+  }, [socket, connected]);
 
   return (
     <div className="p-6">
@@ -42,7 +45,7 @@ const ParkingPage = () => {
         </div>
         <div className="bg-green-500 text-white p-4 rounded-lg">
           <h2 className="text-xl font-semibold">Vacant Spaces</h2>
-          <p className="text-3xl font-bold">{NoOfVacantSpots}</p>
+          <p className="text-3xl font-bold">{noOfVacantSpots}</p>
         </div>
       </div>
 

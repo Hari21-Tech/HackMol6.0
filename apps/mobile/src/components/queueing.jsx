@@ -113,7 +113,7 @@ export default function QueuePage({ navigation }) {
     //   });
 
     return () => {
-      socket.off('get_shop_result')
+      socket.off('get_shop_result');
       // Notifications.removeNotificationSubscription(notificationListener);
       // Notifications.removeNotificationSubscription(responseListener);
     };
@@ -203,6 +203,37 @@ export default function QueuePage({ navigation }) {
       <View style={styles.cardContent}>
         <Text style={styles.name}>{item.name}</Text>
         <Text style={styles.category}>{item.category}</Text>
+
+        {joinedShopId === item.id ? (
+          <View style={styles.buttonRow}>
+            <TouchableOpacity
+              key={`bruh${item.id}`}
+              onPress={() => navigation.navigate('Shop', { shop: item })}
+              style={[styles.button, styles.viewButton]}
+            >
+              <Text style={styles.buttonText}>View</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              key={`bruh2${item.id}`}
+              onPress={handleLeaveQueue}
+              style={[styles.button, styles.leaveButton]}
+            >
+              <Text style={styles.buttonText}>Leave Queue</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <TouchableOpacity
+            onPress={() => handleJoinQueue(item)}
+            style={styles.button}
+          >
+            <Text style={styles.buttonText}>Join Queue</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
+      {/* <View style={styles.cardContent}>
+        <Text style={styles.name}>{item.name}</Text>
+        <Text style={styles.category}>{item.category}</Text>
         {joinedShopId === item.id ? (
           <Text style={styles.category}>ETA: 10 minutes</Text>
         ) : null}
@@ -221,7 +252,7 @@ export default function QueuePage({ navigation }) {
             <Text style={styles.buttonText}>Join Queue</Text>
           </TouchableOpacity>
         )}
-      </View>
+      </View> */}
     </View>
   );
 
@@ -235,8 +266,8 @@ export default function QueuePage({ navigation }) {
           style={styles.picker}
           itemStyle={styles.pickerItem}
         >
-          {categories.map((cat) => (
-            <Picker.Item key={cat} label={cat} value={cat} />
+          {categories.map((cat, index) => (
+            <Picker.Item key={index} label={cat} value={cat} />
           ))}
         </Picker>
       </View>
@@ -306,7 +337,6 @@ export default function QueuePage({ navigation }) {
                 onPress={async () => {
                   setJoinedShop(selectedShopForConfirmation);
                   joinShop(selectedShopForConfirmation.id);
-                  // await scheduleNotification(10); // Schedule notification for 10 minutes ETA
                   setIsConfirmationModalVisible(false);
                   navigation.navigate('Shop', {
                     shop: selectedShopForConfirmation,
@@ -457,6 +487,27 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 24,
     justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 10, // or use marginRight on buttons if gap doesn't work
+  },
+
+  viewButton: {
+    flex: 1,
+    backgroundColor: '#4CAF50',
+    padding: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+
+  leaveButton: {
+    flex: 1,
+    backgroundColor: '#f44336',
+    padding: 10,
+    borderRadius: 8,
     alignItems: 'center',
   },
 });
