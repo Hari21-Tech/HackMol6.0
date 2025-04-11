@@ -1,1 +1,87 @@
 timestamp,camera,event_type,details
+11-04-2025 07:27:46.597803,0,person_detected,Person_001
+11-04-2025 07:27:46.958344,0,person_left,Person_001
+11-04-2025 07:27:46.958344,0,objects_abandoned,"bottle_0, bottle_1"
+11-04-2025 07:27:47.297891,0,abandoned_objects_picked,bottle_1
+11-04-2025 07:27:47.592901,0,objects_abandoned,bottle_1
+11-04-2025 07:27:52.132388,0,abandoned_objects_picked,bottle_1
+11-04-2025 07:27:52.455005,0,objects_abandoned,bottle_1
+11-04-2025 07:27:52.701267,0,abandoned_objects_picked,bottle_1
+11-04-2025 07:27:52.954730,0,objects_abandoned,bottle_1
+11-04-2025 07:27:53.227795,0,abandoned_objects_picked,bottle_1
+11-04-2025 07:27:53.479717,0,objects_abandoned,bottle_1
+11-04-2025 07:29:08.763866,0,person_detected,Person_002
+11-04-2025 07:29:37.338604,1,person_detected,Person_002
+11-04-2025 07:29:38.034329,0,objects_abandoned,"bottle_0, bottle_1"
+11-04-2025 07:29:40.182911,0,abandoned_objects_picked,bottle_1
+11-04-2025 07:29:40.691038,0,objects_abandoned,bottle_1
+11-04-2025 07:29:41.379274,1,person_left,Person_002
+11-04-2025 07:29:42.633174,0,abandoned_objects_picked,bottle_1
+11-04-2025 07:29:42.909887,0,abandoned_objects_picked,bottle_0
+11-04-2025 07:29:45.890056,1,person_detected,Person_002
+11-04-2025 07:29:46.978624,1,objects_with_person,"Person_002: cup_0, bottle_0"
+11-04-2025 07:29:47.478221,1,objects_with_person,Person_002: bottle_2
+11-04-2025 07:29:47.478221,1,objects_removed,Person_002: cup_0
+11-04-2025 07:29:48.541899,1,objects_removed,Person_002: bottle_2
+11-04-2025 07:29:50.158207,1,objects_with_person,Person_002: bottle_1
+11-04-2025 07:29:50.736367,1,objects_with_person,Person_002: bottle_2
+11-04-2025 07:29:50.736947,1,objects_removed,"Person_002: bottle_0, bottle_1"
+11-04-2025 07:29:51.184820,1,person_left,Person_002
+11-04-2025 07:29:51.185795,1,objects_removed,None: bottle_2
+11-04-2025 07:29:51.185795,1,objects_abandoned,"bottle_0, bottle_2"
+11-04-2025 07:29:51.758202,1,person_detected,Person_002
+11-04-2025 07:29:51.758202,1,objects_with_person,"Person_002: bottle_0, bottle_2"
+11-04-2025 07:29:51.758202,1,abandoned_objects_picked,"bottle_0, bottle_2"
+11-04-2025 07:29:52.285094,1,objects_removed,Person_002: bottle_2
+11-04-2025 07:29:52.815018,1,objects_with_person,Person_002: bottle_2
+11-04-2025 07:29:53.319786,1,objects_removed,Person_002: bottle_2
+11-04-2025 07:29:54.084871,1,person_left,Person_002
+11-04-2025 07:29:54.084871,1,objects_removed,None: bottle_0
+11-04-2025 07:29:54.084871,1,objects_abandoned,bottle_2
+11-04-2025 07:29:54.626574,1,person_detected,Person_002
+11-04-2025 07:29:54.627579,1,abandoned_objects_picked,bottle_2
+11-04-2025 07:29:54.891232,1,person_left,Person_002
+11-04-2025 07:29:57.868993,0,objects_abandoned,"bottle_0, umbrella_0, bottle_1"
+11-04-2025 07:29:58.143922,0,abandoned_objects_picked,umbrella_0
+11-04-2025 07:30:01.119137,1,person_detected,Person_002
+11-04-2025 07:30:02.357507,0,abandoned_objects_picked,bottle_1
+11-04-2025 07:30:02.894942,0,objects_abandoned,bottle_1
+11-04-2025 10:22:58.123241,1,person_detected,Person_001
+11-04-2025 10:22:59.179468,1,person_detected,Person_002
+11-04-2025 10:23:01.462722,1,person_left,Person_002
+11-04-2025 10:23:02.292313,1,person_detected,Person_001
+11-04-2025 10:23:03.101400,1,person_detected,Person_002
+11-04-2025 10:23:06.746530,0,objects_abandoned,bottle_0
+11-04-2025 10:23:07.540554,0,abandoned_objects_picked,bottle_0
+11-04-2025 10:23:10.859088,1,person_detected,Person_001
+11-04-2025 10:23:11.760251,1,person_detected,Person_002
+11-04-2025 10:23:12.658964,1,objects_with_person,Person_002: bottle_0
+11-04-2025 10:23:13.245440,0,person_detected,Person_002
+11-04-2025 10:23:13.961694,0,person_left,Person_002
+11-04-2025 10:23:16.872073,1,person_left,Person_002
+11-04-2025 10:23:16.873060,1,objects_removed,None: bottle_0
+11-04-2025 10:23:18.318721,0,person_detected,Person_002
+11-04-2025 10:23:19.515567,0,person_left,Person_002
+11-04-2025 10:23:21.536063,0,objects_abandoned,bottle_0
+11-04-2025 10:23:22.399480,0,person_detected,Person_002
+11-04-2025 10:23:22.400475,0,objects_with_person,Person_002: bottle_0
+11-04-2025 10:23:22.400475,0,abandoned_objects_picked,bottle_0
+11-04-2025 10:23:23.273864,0,objects_removed,Person_002: bottle_0
+11-04-2025 10:23:23.273864,0,objects_abandoned,bottle_0
+11-04-2025 10:23:23.687149,0,person_left,Person_002
+11-04-2025 10:23:23.687149,0,abandoned_objects_picked,bottle_0
+11-04-2025 10:23:24.759956,1,person_detected,Person_002
+11-04-2025 10:23:26.131829,1,person_left,Person_002
+11-04-2025 10:23:26.756481,0,objects_abandoned,bottle_0
+11-04-2025 10:23:27.484747,1,person_detected,Person_002
+11-04-2025 10:23:27.634062,0,objects_abandoned,vase_0
+11-04-2025 10:23:27.634062,0,abandoned_objects_picked,bottle_0
+11-04-2025 10:23:28.521612,0,objects_abandoned,bottle_0
+11-04-2025 10:23:28.524212,0,abandoned_objects_picked,vase_0
+11-04-2025 10:23:29.377818,0,abandoned_objects_picked,bottle_0
+11-04-2025 10:23:30.211935,0,objects_abandoned,bottle_0
+11-04-2025 10:23:31.041637,0,abandoned_objects_picked,bottle_0
+11-04-2025 10:23:31.871637,0,objects_abandoned,bottle_0
+11-04-2025 10:23:32.315839,1,person_left,Person_002
+11-04-2025 10:23:33.454318,1,person_detected,Person_002
+11-04-2025 10:23:36.796729,0,abandoned_objects_picked,bottle_0
