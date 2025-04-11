@@ -16,6 +16,7 @@ export const fakerData: () => ParkingData = () => ({
 const CREATE_QUERY =
   'INSERT INTO parking (name, number_of_empty_spots, maximum_number_of_spots) VALUES ($1, $2, $3);';
 const GET_QUERY = 'SELECT * FROM parking WHERE id=$1;';
+const GET_ALL_QUERY = 'SELECT * FROM parking;';
 const DELETE_QUERY = 'DELETE FROM parking WHERE id=$1;';
 const UPDATE_QUERY = (
   name: string | null,
@@ -83,6 +84,12 @@ function getParking(
   });
 }
 
+function getAllParking(pool: Pool): DatabaseReturn<ParkingEntry> {
+  return Result(async () => {
+    return await pool.query<ParkingEntry>(GET_ALL_QUERY);
+  });
+}
+
 function updateParking(
   pool: Pool,
   parking_id: number,
@@ -117,6 +124,7 @@ export function bundle(pool: Pool) {
   return {
     createParking: createParking.bind(null, pool),
     getParking: getParking.bind(null, pool),
+    getAllParking: getAllParking.bind(null, pool),
     updateParking: updateParking.bind(null, pool),
     deleteParking: deleteParking.bind(null, pool),
   };

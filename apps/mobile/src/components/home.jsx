@@ -103,7 +103,7 @@ const Home = () => {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate('Parking Helper')}
+        onPress={() => navigation.navigate('ParkingLots')}
       >
         <Text style={styles.buttonText}>Parking</Text>
       </TouchableOpacity>

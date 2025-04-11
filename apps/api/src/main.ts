@@ -34,14 +34,13 @@ const io = new Server(server);
 setupSocketEvents(io, frontend_io, admin_io);
 
 frontend_io.on('connection', (socket) => {
-    socket.on('get_shop', async (shop_id) => {
-      const data = await database.shops.getShop(shop_id);
-      const response = await fetch('https://picsum.photos/200/300');
-      if (!data.success) {
-        return;
-      }
-      data.result.rows[0].image = response.url;
-
+  socket.on('get_shop', async (shop_id) => {
+    const data = await database.shops.getShop(shop_id);
+    const response = await fetch('https://picsum.photos/200/300');
+    if (!data.success) {
+      return;
+    }
+    data.result.rows[0].image = response.url;
       return socket.emit('get_shop_result', data);
     });
     socket.on('get_shop_queue', async (shop_id) => {
@@ -91,7 +90,5 @@ admin_receiver_server.listen(process.env.ADMIN_WS_PORT, () => {
 });
 
 server.listen(process.env.WS_PORT, () => {
-  console.log(
-    `Server is running on port ${process.env.WS_PORT}`
-  );
+  console.log(`Server is running on port ${process.env.WS_PORT}`);
 });

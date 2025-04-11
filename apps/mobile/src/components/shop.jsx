@@ -25,14 +25,16 @@ export default function ShopDetail({ route, navigation }) {
   const [queueCount, setQueueCount] = useState(0);
   const [currentOccupancy, setCurrentOccupancy] = useState(0);
 
+  const [eta, setEta] = useState(0);
+
   useEffect(() => {
     if (!socket) return;
     socket.on('get_shop_queue_result', (data) => {
       setQueueCount(data.result.rows.length);
-    })
+    });
     socket.on('queue_update', (data) => {
       console.log('Queue update received:', data);
-      setCurrentOccupancy(data.people);
+      setCurrentOccupancy(data);
     });
 
     if (connected) {
@@ -44,7 +46,7 @@ export default function ShopDetail({ route, navigation }) {
     return () => {
       socket.off('get_shop_queue_result');
       socket.off('queue_update');
-    }
+    };
   }, []);
 
   const getUserLocation = async () => {
@@ -59,9 +61,9 @@ export default function ShopDetail({ route, navigation }) {
 
     setLocation({ latitude, longitude });
     setDistance(
-      getDistanceFromLatLonInKm(
-        latitude,
-        longitude,
+      setDistanceFromLatLonInKm(
+        location.latitude,
+        location.longitude,
         shop.latitude,
         shop.longitude
       )
@@ -83,6 +85,22 @@ export default function ShopDetail({ route, navigation }) {
 
   const deg2rad = (deg) => deg * (Math.PI / 180);
 
+  // setDistance(
+  //   getDistanceFromLatLonInKm(
+  //     latitude,
+  //     longitude,
+  //     shop.latitude,
+  //     shop.longitude
+  //   )
+  // );
+  console.log(distance);
+
+  // if (currentOccupancy + queueCount <= shop.total_occupancy) {
+  //   setEta(0);
+  // } else {
+  //   setEta(((currentOccupancy + queueCount) - shop.total_occupancy) * ETA_PER_PERSON);
+  // set distnace factor here
+
   const { leaveShop } = useQueue();
   return (
     <LinearGradient
@@ -97,16 +115,13 @@ export default function ShopDetail({ route, navigation }) {
 
             <View style={styles.infoSection}>
               {/* <Text style={styles.sectionTitle}>Description</Text> */}
-              <Text style={styles.description}>
-                Welcome to {shop.name}! We provide excellent service in the{' '}
-                {shop.category} category.
-              </Text>
+              <Text style={styles.description}>{shop.description}</Text>
             </View>
 
             <View>
               <Text>Current Occupancy : {currentOccupancy}</Text>
               <Text>Total Capacity : {shop.total_occupancy}</Text>
-              {location && <Text>ETA : {(currentOccupancy + queueCount) * ETA_PER_PERSON} minutes</Text>}
+              {location && <Text>ETA : {eta} minutes</Text>}
             </View>
           </View>
         </ScrollView>
