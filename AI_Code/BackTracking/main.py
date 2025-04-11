@@ -7,6 +7,8 @@ import cv2
 import shutil
 
 from core.tracker import MultiCamTracker
+from core.backtracker import Backtracker
+
 
 def reset_data():
     """Reset all tracking data: embeddings, faces, and logs"""
@@ -59,7 +61,7 @@ def main():
         return
     
     # Initialize tracker
-    tracker = MultiCamTracker(sources=args.cameras, log_file=args.log)
+    tracker = MultiCamTracker(sources=args.cameras)
     
     if not args.backtrack:
         # Normal tracking mode
@@ -109,15 +111,25 @@ def main():
         print("Make sure you have tracking data in the correct format.")
         return
 
-    # Backtrack mode
+    # # Backtrack mode
+    # if args.object:
+    #     tracker.backtrack_object(args.object)
+    # else:
+    #     if not tracker.object_timeline:
+    #         print("\nNo tracked objects found in the log file.")
+    #         print("Try running the tracker first to generate some tracking data.")
+    #         return
+    #     tracker.backtrack_object()
+
     if args.object:
-        tracker.backtrack_object(args.object)
+        print(1)
+        bt = Backtracker(args.log)
+        print(2)
+        bt.backtrack_by_type(args.object)
+        print(3)
     else:
-        if not tracker.object_timeline:
-            print("\nNo tracked objects found in the log file.")
-            print("Try running the tracker first to generate some tracking data.")
-            return
-        tracker.backtrack_object()
+        print("Please specify an object using --object to backtrack.")
+
     
 
 if __name__ == "__main__":
