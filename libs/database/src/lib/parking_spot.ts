@@ -19,6 +19,7 @@ export const fakerData: () => ParkingSpotData = () => ({
 const CREATE_QUERY =
   'INSERT INTO parking_spot (parking_id, floor, spot) VALUES ($1, $2, $3) ON CONFLICT (parking_id, position_label) DO NOTHING;';
 const GET_QUERY = 'SELECT * FROM parking_spot WHERE parking_id=$1;';
+const GET_ALL_QUERY = 'SELECT * FROM parking_spot;';
 const DELETE_QUERY = 'DELETE FROM parking_spot WHERE id=$1;';
 const DELETE_ALL_QUERY = 'DELETE FROM parking_spot WHERE parking_id=$1;';
 
@@ -42,6 +43,16 @@ function getParkingSpots(
     return await pool.query<ParkingSpotEntry>(GET_QUERY, [parking_id]);
   });
 }
+
+function getAllParkingSpots(
+  pool: Pool,
+): DatabaseReturn<ParkingSpotEntry> {
+  return Result(async () => {
+    console.log('parking_spot: getAllParkingSpots');
+    return await pool.query<ParkingSpotEntry>(GET_ALL_QUERY);
+  });
+}
+
 
 function addParkingSpot(
   pool: Pool,
@@ -80,6 +91,7 @@ function removeAllOfParkingArea(
 export function bundle(pool: Pool) {
   return {
     getParkingSpots: getParkingSpots.bind(null, pool),
+    getAllParkingSpots: getAllParkingSpots.bind(null, pool),
     addParkingSpot: addParkingSpot.bind(null, pool),
     removeParkingSpot: removeParkingSpot.bind(null, pool),
     removeAllOfParkingArea: removeAllOfParkingArea.bind(null, pool),

@@ -31,10 +31,12 @@ export default function ShopDetail({ route, navigation }) {
     if (!socket) return;
     socket.on('get_shop_queue_result', (data) => {
       setQueueCount(data.result.rows.length);
+      console.log(currentOccupancy, queueCount)
     });
     socket.on('queue_update', (data) => {
       console.log('Queue update received:', data);
       setCurrentOccupancy(data);
+      setEta(data * ETA_PER_PERSON);
     });
 
     if (connected) {
@@ -98,7 +100,6 @@ export default function ShopDetail({ route, navigation }) {
   // if (currentOccupancy + queueCount <= shop.total_occupancy) {
   //   setEta(0);
   // } else {
-  //   setEta(((currentOccupancy + queueCount) - shop.total_occupancy) * ETA_PER_PERSON);
   // set distnace factor here
 
   const { leaveShop } = useQueue();

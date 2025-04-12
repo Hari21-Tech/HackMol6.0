@@ -36,11 +36,10 @@ setupSocketEvents(io, frontend_io, admin_io);
 frontend_io.on('connection', (socket) => {
   socket.on('get_shop', async (shop_id) => {
     const data = await database.shops.getShop(shop_id);
-    const response = await fetch('https://picsum.photos/200/300');
     if (!data.success) {
       return;
     }
-    data.result.rows[0].image = response.url;
+    data.result.rows[0].image = 'https://picsum.photos/200/300';
       return socket.emit('get_shop_result', data);
     });
     socket.on('get_shop_queue', async (shop_id) => {
@@ -74,6 +73,13 @@ frontend_io.on('connection', (socket) => {
     socket.on('start_back_tracking', (label) => {
       console.log('Starting backtracking for label:', label);
       io.emit('start_back_tracking', label);
+    });
+    socket.on('get_all_parking', async() => {
+      const data = await database.parking.getAllParking();
+      if (!data.success) {
+        return;
+      }
+      return socket.emit('get_all_parking_result', data);
     })
 });
 
